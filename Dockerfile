@@ -10,9 +10,9 @@ RUN export PATH=$PATH:/usr/local/go/bin:/root/go/bin \
     && apt-get install -y --no-install-recommends ca-certificates curl wget \
     && GOARCH=${TARGETARCH:-amd64} \
     && if [ "$GOARCH" = "arm64" ]; then GOARCH_URL="arm64"; else GOARCH_URL="amd64"; fi \
-    && wget -q https://go.dev/dl/go1.23.5.linux-${GOARCH_URL}.tar.gz \
-    && tar -C /usr/local -xzf go1.23.5.linux-${GOARCH_URL}.tar.gz \
-    && rm go1.23.5.linux-${GOARCH_URL}.tar.gz \
+    && wget -q https://go.dev/dl/go1.25.5.linux-${GOARCH_URL}.tar.gz \
+    && tar -C /usr/local -xzf go1.25.5.linux-${GOARCH_URL}.tar.gz \
+    && rm go1.25.5.linux-${GOARCH_URL}.tar.gz \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean \
@@ -22,7 +22,7 @@ RUN export PATH=$PATH:/usr/local/go/bin:/root/go/bin \
     && /root/go/bin/playwright install chromium --with-deps
 
 # Build stage
-FROM golang:1.23-bookworm AS builder
+FROM golang:1.25.5-trixie AS builder
 ARG TARGETARCH
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -31,7 +31,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOARCH=${TARGETARCH:-amd64} go build -ldflags="-w -s" -o /usr/bin/google-maps-scraper
 
 # Final stage
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/browsers
 ENV PLAYWRIGHT_DRIVER_PATH=/opt
 
